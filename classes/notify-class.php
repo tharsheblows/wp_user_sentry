@@ -20,7 +20,6 @@ class Notify {
 	 */
 	static function runNotify( $user_login, $user = false ) { // @phpcs:ignore
 
-		error_log( 'in runNotify', 0 );
 		if ( ! $user || empty( $user ) ) {
 			$user = get_user_by( 'login', $user_login );
 		}
@@ -47,7 +46,7 @@ class Notify {
 		if ( true !== $send ) {
 			return true;
 		}
-		error_log( 'before sendEmail', 0 );
+
 		return self::sendEmail( $user );
 	}
 
@@ -117,8 +116,6 @@ To review activity on your account visit {profile_url} or login to your admin on
 			'headers' => $headers,
 		);
 
-		error_log( print_r( $email, true ), 0 );
-
 		/**
 		 * This filter allows use of template tags in subject and message.
 		 */
@@ -141,9 +138,9 @@ To review activity on your account visit {profile_url} or login to your admin on
 		);
 
 		if ( ! $sent ) {
-			error_log( 'User Sentry Email was not sent', 0 );
+			error_log( $error_message, 0 );
 		}
-		error_log( 'mail sent', 0 );
+
 		return true;
 	}
 
