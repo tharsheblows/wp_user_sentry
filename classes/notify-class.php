@@ -26,8 +26,8 @@ class Notify {
 		$settings = get_option( 'wp_user_sentry_settings' );
 		$send     = true;
 
-		// Check their roles and see if we should notify.
-		if ( isset( $settings['notify_login_roles'] ) && is_array( $settings['notify_login_roles'] ) ) {
+		// Check their roles and see if we should notify. If they are a super admin, they always get notified.
+		if ( isset( $settings['notify_login_roles'] ) && is_array( $settings['notify_login_roles'] ) && ! is_super_admin( $user->ID ) ) {
 			if ( ! array_intersect( $user->roles, $settings['notify_login_roles'] ) ) {
 				$send = false;
 			}
@@ -108,7 +108,7 @@ To review activity on your account visit {profile_url} or login to your admin on
 		}
 
 		$subject = "[$blogname] $subject";
-		$email    = array(
+		$email   = array(
 			'to'      => $user->user_email,
 			'subject' => $subject,
 			'message' => $message,
