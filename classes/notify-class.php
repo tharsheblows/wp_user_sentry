@@ -102,8 +102,7 @@ To review activity on your account visit {profile_url} or login to your admin on
 			$cc_array  = explode( ',', $cc_string );
 
 			foreach ( $cc_array as $cc ) {
-				$email_to_add = trim( $cc );
-				$headers[]    = "cc: $email_to_add";
+				$headers[]    = "Cc: $cc";
 			}
 		}
 
