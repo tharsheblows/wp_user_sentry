@@ -156,9 +156,9 @@ class Admin {
 				$checked = 'checked';
 			}
 
-			$html .= '<input type="checkbox" name="wp_user_sentry_settings[notify_login_roles][]" value="' . $role . '" ' . $checked . ' />' . $data['name'] . '</br>';
+			$html .= '<input type="checkbox" name="wp_user_sentry_settings[notify_login_roles][]" value="' . esc_attr( $role ) . '" ' . $checked . ' />' . esc_html( $data['name'] ) . '</br>';
 		}
-		echo wp_kses_post( $html ); // Handwaving escaping.
+		echo $html; // @phpcs:ignore
 	}
 
 	/**
