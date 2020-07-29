@@ -58,6 +58,13 @@ class Admin {
 			'wp-user-sentry-settings',
 			'wp_user_sentry_settings_section'
 		);
+		add_settings_field(
+			'notify_login_email_addresses',
+			__( 'Additional email addresses which should receive the login notification (comma separated)' ),
+			array( __NAMESPACE__ . '\Admin', 'fieldEmailAddressRender' ),
+			'wp-user-sentry-settings',
+			'wp_user_sentry_settings_section'
+		);
 
 		/*
 		* Test Email Hooks
@@ -151,7 +158,7 @@ class Admin {
 
 			$html .= '<input type="checkbox" name="wp_user_sentry_settings[notify_login_roles][]" value="' . $role . '" ' . $checked . ' />' . $data['name'] . '</br>';
 		}
-		echo $html;
+		echo wp_kses_post( $html ); // Handwaving escaping.
 	}
 
 	/**
@@ -191,7 +198,7 @@ To review activity on your account visit {profile_url} or login to your admin on
 			$contents = $options['notify_login_email'];
 		}
 		?>
-	<textarea name="wp_user_sentry_settings[notify_login_email]" class="large-text code" rows="8" spellcheck="false"><?php echo $contents; ?></textarea>
+	<textarea name="wp_user_sentry_settings[notify_login_email]" class="large-text code" rows="8" spellcheck="false"><?php echo esc_textarea( $contents ); ?></textarea>
 	<p class="description"><?php _e( 'The following dyanmic parameters may be added:', 'wp-user-sentry' ); ?> <strong>{displayname}, {user_login}, {ip}, {os}, {browser}, {country}, {flag}, {time}, {profile_url}, {homeurl}</strong></p>
 	<button type="button" name="wp-user-sentry-test-email" class="button wp-user-sentry-test-email"><?php _e( 'Send Test Email', 'wp-user-sentry' ); ?></button>
 		<?php
@@ -210,7 +217,25 @@ To review activity on your account visit {profile_url} or login to your admin on
 			$subject = $options['notify_login_email_subject'];
 		}
 		?>
-	<input type="text" name="wp_user_sentry_settings[notify_login_email_subject]" value="<?php echo $subject; ?>">
+	<input type="text" name="wp_user_sentry_settings[notify_login_email_subject]" value="<?php echo esc_textarea( $subject ); ?>">
+		<?php
+	}
+
+	/**
+	 * Input Field for email address to add to cc.
+	 *
+	 * @access public static
+	 * @since 1.1.0
+	 */
+	static function fieldEmailAddressRender() { // @phpcs:ignore
+		$options = get_option( 'wp_user_sentry_settings' );
+		if ( ! isset( $options['notify_login_email_addresses'] ) ) {
+			$emails_to_add = '';
+		} else {
+			$emails_to_add = $options['notify_login_email_addresses'];
+		}
+		?>
+	<input type="text" name="wp_user_sentry_settings[notify_login_email_addresses]" value="<?php echo esc_textarea( $emails_to_add ); ?>">
 		<?php
 	}
 	/**

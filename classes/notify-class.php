@@ -62,10 +62,13 @@ class Notify {
 		$settings = get_option( 'wp_user_sentry_settings' );
 
 		if ( ! empty( $email ) && isset( $email['message'] ) ) {
+			// If we've passed it an email, use that.
 			$message = $email['message'];
 		} elseif ( isset( $settings['notify_login_email'] ) ) {
+			// Otherwise, if there's a message in settings, use that.
 			$message = $settings['notify_login_email'];
 		} else {
+			// The default if there's nothing in settings or no email passed.
 			$message = __(
 				'Hi, {display_name} [{user_login}],
 Your account on {homeurl} was logged into at {time},
@@ -80,19 +83,36 @@ To review activity on your account visit {profile_url} or login to your admin on
 		$message = apply_filters( 'wp_user_sentry_email_message', $message );
 
 		if ( ! empty( $email ) && isset( $email['subject'] ) ) {
+			// If there's an email with a subject passed, use that.
 			$subject = $email['subject'];
 		} elseif ( isset( $settings['notify_login_email_subject'] ) ) {
+			// Then try the one in settings.
 			$subject = $settings['notify_login_email_subject'];
 		} else {
+			// The default subject.
 			$subject = __( 'Successful login for {user_login}' );
 		}
 
 		$blogname = wp_specialchars_decode( get_option( 'blogname' ), ENT_QUOTES );
+
+		// If there are cc addresses, add them in.
+		$headers = [];
+		if ( ! empty( $settings['notify_login_email_addresses'] ) ) {
+			$cc_string = $settings['notify_login_email_addresses'];
+			$cc_array  = explode( ',', $cc_string );
+
+			foreach ( $cc_array as $cc ) {
+				$email_to_add = trim( $cc );
+				$headers[]    = "cc: $email_to_add";
+			}
+		}
+
+		$subject = "[$blogname] $subject";
 		$email    = array(
 			'to'      => $user->user_email,
-			'subject' => __( '[' . $blogname . '] ' . $subject ),
+			'subject' => $subject,
 			'message' => $message,
-			'headers' => '',
+			'headers' => $headers,
 		);
 
 		/**
