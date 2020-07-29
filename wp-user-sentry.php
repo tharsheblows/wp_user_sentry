@@ -35,7 +35,7 @@ class wp_user_sentry { // @phpcs:ignore
 		);
 		add_action( 'show_user_profile', array( __NAMESPACE__ . '\\Profile', 'userProfile' ), 0 );
 		add_action( 'edit_user_profile', array( __NAMESPACE__ . '\\Profile', 'userProfile' ), 0 );
-		add_action( 'wp_login', array( __NAMESPACE__ . '\\Notify', 'runNotify' ) );
+		add_action( 'wp_login', array( __NAMESPACE__ . '\\Notify', 'runNotify' ), 5, 2 );
 		add_action( 'admin_init', array( __NAMESPACE__ . '\\Admin', 'adminInit' ) );
 		add_action(
 			'admin_menu',
