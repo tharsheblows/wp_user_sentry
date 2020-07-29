@@ -19,6 +19,8 @@ class Notify {
 	 * @return bool   triggers sendEmail This always returns true I think.
 	 */
 	static function runNotify( $user_login, $user = false ) { // @phpcs:ignore
+
+		error_log( 'in runNotify', 0 );
 		if ( ! $user || empty( $user ) ) {
 			$user = get_user_by( 'login', $user_login );
 		}
@@ -45,6 +47,7 @@ class Notify {
 		if ( true !== $send ) {
 			return true;
 		}
+		error_log( 'before sendEmail', 0 );
 		return self::sendEmail( $user );
 	}
 
@@ -114,6 +117,8 @@ To review activity on your account visit {profile_url} or login to your admin on
 			'headers' => $headers,
 		);
 
+		error_log( print_r( $email, true ), 0 );
+
 		/**
 		 * This filter allows use of template tags in subject and message.
 		 */
@@ -127,16 +132,18 @@ To review activity on your account visit {profile_url} or login to your admin on
 		 * Filter email array after render.
 		 */
 		$email = apply_filters( 'wp_user_sentry_login_email', $email );
-		try {
-			wp_mail(
-				$email['to'],
-				$email['subject'],
-				$email['message'],
-				$email['headers']
-			);
-		} catch ( \Exception $e ) {
-			error_log( $error_message );
+
+		$sent = wp_mail(
+			$email['to'],
+			$email['subject'],
+			$email['message'],
+			$email['headers']
+		);
+
+		if ( ! $sent ) {
+			error_log( 'User Sentry Email was not sent', 0 );
 		}
+		error_log( 'mail sent', 0 );
 		return true;
 	}
 
